@@ -40,6 +40,11 @@ class AddressCode:
         return AddressCode.get_html(addr_code_url)
 
     @staticmethod
+    def get_1995_addr_code_html():
+        addr_code_url = 'http://www.mca.gov.cn/article/sj/tjbz/a/201713/201708220913.html'
+        return AddressCode.get_html(addr_code_url)
+
+    @staticmethod
     def get_latest_addr_code(base_url):
         content = AddressCode.get_latest_addr_code_html(base_url)
 
@@ -56,15 +61,35 @@ class AddressCode:
         return dic
 
     @staticmethod
-    def save_addr_code_to_json(base_url):
-        with open('../data/addr_code.json', 'w') as file:
-            addr_code_dict = AddressCode.get_latest_addr_code(base_url)
+    def get_1995_addr_code():
+        content = AddressCode.get_1995_addr_code_html()
+
+        soup = BeautifulSoup(content, 'html.parser')
+        tds = soup.find_all('td')
+
+        dic = {}
+        iter_tds = iter(tds)
+
+        for td in iter_tds:
+            if Utils.represents_int(td.string):
+                dic[td.string] = next(iter_tds).string
+
+        return dic
+
+    @staticmethod
+    def save_addr_code_to_json(file_name=None, base_url=None, old=False):
+        file_name = 'addr_code.json' if file_name is None else file_name
+
+        with open('../data/' + file_name, 'w') as file:
+            addr_code_dict = AddressCode.get_latest_addr_code(base_url) if not old else AddressCode.get_1995_addr_code()
             file.write(json.dumps(addr_code_dict, ensure_ascii=False))
 
     @staticmethod
-    def read_addr_code_from_local():
+    def read_addr_code_from_local(file_name=None):
+        file_name = 'addr_code.json' if file_name is None else file_name
+
         try:
-            file = open('../data/addr_code.json', 'r')
+            file = open('../data/' + file_name, 'r')
         except FileNotFoundError as err:
             print(err)
         except OSError as err:
@@ -79,3 +104,5 @@ if __name__ == '__main__':
     url = 'http://www.mca.gov.cn/article/sj/xzqh//1980/'
     # AddressCode.save_addr_code_to_json(url)
     pprint(AddressCode.read_addr_code_from_local())
+
+    AddressCode.save_addr_code_to_json(file_name='1995_addr_code.json', old=True)
