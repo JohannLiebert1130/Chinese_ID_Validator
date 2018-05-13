@@ -6,6 +6,7 @@ import re
 class ChineseID:
     address_code_url = 'http://www.mca.gov.cn/article/sj/xzqh//1980/'
     addr_code_dic = AddressCode.read_addr_code_from_local()
+    add_code_1995_dic = AddressCode.read_addr_code_from_local('1995_addr_code.json')
 
     def __init__(self, id_str):
         self.id_str = id_str
@@ -31,6 +32,8 @@ class ChineseID:
     def is_valid_addr_code(self):
 
         if self.address_code in ChineseID.addr_code_dic:
+            return True
+        elif self.address_code in ChineseID.add_code_1995_dic:
             return True
         else:
             return False
@@ -79,7 +82,5 @@ if __name__ == '__main__':
 
     print(example.is_valid_id())
 
-    example2 = ChineseID('330183199611305027')
+    example2 = ChineseID('330185199703413359')
     print(example2.is_valid_id())
-
-    print(ChineseID.addr_code_dic)
