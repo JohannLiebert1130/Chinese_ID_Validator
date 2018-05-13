@@ -15,7 +15,10 @@ class Utils:
         try:
             datetime.datetime.strptime(date_text, '%Y%m%d')
         except:
-            raise ValueError("Incorrect data format, should be YYYYMMDD")
+            print("Incorrect data format, should be YYYYMMDD")
+            return False
+        else:
+            return True
 
 
 if __name__ == '__main__':
@@ -25,6 +28,7 @@ if __name__ == '__main__':
             next(iters)
         print(i)
 
-    Utils.is_valid_date('20090312')
+    print(Utils.is_valid_date('20090312'))
+    print(Utils.is_valid_date('200jk90312'))
 
 
