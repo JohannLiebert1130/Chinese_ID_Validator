@@ -1,4 +1,12 @@
+from src.get_administrative_divisions_codes import AddressCode
+from src.utils import Utils
+import re
+
+
 class ChineseID:
+    address_code_url = 'http://www.mca.gov.cn/article/sj/xzqh//1980/'
+    addr_code_dic = AddressCode.get_latest_addr_code(address_code_url)
+
     def __init__(self, id_str):
         self.id_str = id_str
 
@@ -21,13 +29,21 @@ class ChineseID:
             return False
 
     def is_valid_addr_code(self):
-        pass
+
+        if self.address_code in ChineseID.addr_code_dic:
+            return True
+        else:
+            return False
 
     def is_valid_birth_date(self):
-        pass
+        return Utils.is_valid_date(self.birth_date_code)
 
     def is_valid_sequence_code(self):
-        pass
+        p = re.compile(r'\d\d\d$')
+        if p.match(self.sequence_code) is not None:
+            return True
+        else:
+            return False
 
     def is_valid_check_code(self):
         pass
@@ -37,8 +53,7 @@ class ChineseID:
 
 
 if __name__ == '__main__':
-    example = ChineseID('305020189608140115')
+    example = ChineseID('330225189608140005')
     print(example)
-
-    example2 = ChineseID('1111111111111111111')
-    print(example2)
+    example.is_valid_addr_code()
+    print(example.is_valid_sequence_code())
