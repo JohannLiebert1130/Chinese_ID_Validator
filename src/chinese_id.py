@@ -62,7 +62,7 @@ class ChineseID:
 
     def is_valid_id(self):
         print(f'is valid length: {self.is_valid_length()}\n'
-              f'is valid addr: {self.is_valid_addr_code()}\n'
+              f'is valid address: {self.is_valid_addr_code()}\n'
               f'is valid birth: {self.is_valid_birth_date()}\n'
               f'is valid sequence code: {self.is_valid_sequence_code()}\n'
               f'is valid check code: {self.is_valid_check_code()}')
@@ -73,14 +73,43 @@ class ChineseID:
         else:
             return False
 
+    def get_address_details(self):
+        """
+        Suppose this ID is valid, the function will get the ID's address information in details.
+        :return: a string which contain the ID owner's birth place.
+        """
+        if self.address_code in ChineseID.addr_code_dic:
+            dic = ChineseID.addr_code_dic
+        else:
+            dic = ChineseID.add_code_1995_dic
+
+        birth_place = dic[self.address_code]
+        if self.address_code[-2:] != '00':
+            birth_place = dic[self.address_code[:-2]+'00'] + birth_place
+        if self.address_code[2:4] != '00':
+            birth_place = dic[self.address_code[:2]+'0000'] + birth_place
+
+        return birth_place
+
+    def get_id_details(self):
+        """
+        Suppose this ID is valid, the function will get the ID's information in details.
+        :return: a Python dict which contain the ID owner's birth place, birthday and gender.
+        """
+        birth_place = self.get_address_details()
+        birthday = self.birth_date_code[:4] + '-' + self.birth_date_code[4:6] + '-' + self.birth_date_code[6:]
+        gender = 'Male' if int(self.sequence_code[-1]) % 2 == 1 else 'Female'
+
+        details = {'Birth place': birth_place,
+                   'Birthday': birthday,
+                   'Gender': gender}
+
+        return details
+
 
 if __name__ == '__main__':
     example = ChineseID('530121198904253359')
-    # print(example)
-    # example.is_valid_addr_code()
-    # print(example.is_valid_sequence_code())
 
     print(example.is_valid_id())
-
-    example2 = ChineseID('330185199703413359')
-    print(example2.is_valid_id())
+    print(example.address_code)
+    print(example.get_id_details())
