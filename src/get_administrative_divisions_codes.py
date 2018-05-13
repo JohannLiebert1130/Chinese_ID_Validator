@@ -4,6 +4,8 @@ import requests
 
 from bs4 import BeautifulSoup
 
+from src.utils import Utils
+
 
 class AddressCode:
 
@@ -58,10 +60,25 @@ class AddressCode:
 
     @staticmethod
     def get_latest_addr_code(base_url):
-        pass
+        content = AddressCode.read_addr_code_from_local()
+        if content is None:
+            AddressCode.save_add_code_html_text(base_url)
+            content = AddressCode.read_addr_code_from_local()
+
+        soup = BeautifulSoup(content, 'html.parser')
+        tds = soup.find_all('td')
+
+        dic = {}
+        iter_tds = iter(tds)
+
+        for td in iter_tds:
+            if Utils.represents_int(td.string):
+                dic[td.string] = next(iter_tds).string
+        return dic
 
 
 if __name__ == '__main__':
     url = 'http://www.mca.gov.cn/article/sj/xzqh//1980/'
     print(AddressCode.get_latest_addr_code_url(url))
-    AddressCode.get_latest_addr_code(url)
+    dic = AddressCode.get_latest_addr_code(url)
+    print(dic)
