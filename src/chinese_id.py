@@ -5,7 +5,7 @@ import re
 
 class ChineseID:
     address_code_url = 'http://www.mca.gov.cn/article/sj/xzqh//1980/'
-    addr_code_dic = AddressCode.get_latest_addr_code(address_code_url)
+    addr_code_dic = AddressCode.read_addr_code_from_local()
 
     def __init__(self, id_str):
         self.id_str = id_str
@@ -46,14 +46,40 @@ class ChineseID:
             return False
 
     def is_valid_check_code(self):
-        pass
+        sum = 0
+        for i in range(17):
+            sum += ((1 << (17 - i)) % 11) * int(self.id_str[i])
+        print(sum)
+        n = (12 - (sum % 11)) % 11
+        print(n)
+        if n < 10:
+            return n == int(self.id_str[17])
+        else:
+            return self.id_str[17] == 'X'
 
     def is_valid_id(self):
-        pass
+        print(f'is valid length: {self.is_valid_length()}\n'
+              f'is valid addr: {self.is_valid_addr_code()}\n'
+              f'is valid birth: {self.is_valid_birth_date()}\n'
+              f'is valid sequence code: {self.is_valid_sequence_code()}\n'
+              f'is valid check code: {self.is_valid_check_code()}')
+        if self.is_valid_length() and self.is_valid_addr_code() and self.is_valid_birth_date() \
+                and self.is_valid_sequence_code() and self.is_valid_check_code():
+
+            return True
+        else:
+            return False
 
 
 if __name__ == '__main__':
-    example = ChineseID('330225189608140005')
-    print(example)
-    example.is_valid_addr_code()
-    print(example.is_valid_sequence_code())
+    example = ChineseID('530121198904253359')
+    # print(example)
+    # example.is_valid_addr_code()
+    # print(example.is_valid_sequence_code())
+
+    print(example.is_valid_id())
+
+    example2 = ChineseID('330183199611305027')
+    print(example2.is_valid_id())
+
+    print(ChineseID.addr_code_dic)

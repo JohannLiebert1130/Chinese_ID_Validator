@@ -39,7 +39,6 @@ class AddressCode:
         addr_code_url = AddressCode.get_latest_addr_code_url(base_url)
         return AddressCode.get_html(addr_code_url)
 
-
     @staticmethod
     def get_latest_addr_code(base_url):
         content = AddressCode.get_latest_addr_code_html(base_url)
@@ -61,7 +60,6 @@ class AddressCode:
         with open('../data/addr_code.json', 'w') as file:
             addr_code_dict = AddressCode.get_latest_addr_code(base_url)
             file.write(json.dumps(addr_code_dict, ensure_ascii=False))
-
 
     @staticmethod
     def read_addr_code_from_local():
