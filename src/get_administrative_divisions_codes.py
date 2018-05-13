@@ -44,6 +44,19 @@ class AddressCode:
             file.write(AddressCode.get_latest_addr_code_html(base_url))
 
     @staticmethod
+    def read_addr_code_from_local():
+        try:
+            file = open('../data/adrr_code_html_text.txt', 'r')
+        except FileNotFoundError as err:
+            print(err)
+        except OSError as err:
+            print(err)
+        else:
+            content = file.read()
+            file.close()
+            return content
+
+    @staticmethod
     def get_latest_addr_code(base_url):
         pass
 
@@ -51,3 +64,4 @@ class AddressCode:
 if __name__ == '__main__':
     url = 'http://www.mca.gov.cn/article/sj/xzqh//1980/'
     print(AddressCode.get_latest_addr_code_url(url))
+    AddressCode.get_latest_addr_code(url)
