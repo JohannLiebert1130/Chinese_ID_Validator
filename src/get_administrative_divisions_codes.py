@@ -1,9 +1,8 @@
+import json
 from pprint import pprint
 
 import requests
-
 from bs4 import BeautifulSoup
-
 from src.utils import Utils
 
 
@@ -40,30 +39,10 @@ class AddressCode:
         addr_code_url = AddressCode.get_latest_addr_code_url(base_url)
         return AddressCode.get_html(addr_code_url)
 
-    @staticmethod
-    def save_add_code_html_text(base_url):
-        with open('../data/adrr_code_html_text.txt', 'w') as file:
-            file.write(AddressCode.get_latest_addr_code_html(base_url))
-
-    @staticmethod
-    def read_addr_code_from_local():
-        try:
-            file = open('../data/adrr_code_html_text.txt', 'r')
-        except FileNotFoundError as err:
-            print(err)
-        except OSError as err:
-            print(err)
-        else:
-            content = file.read()
-            file.close()
-            return content
 
     @staticmethod
     def get_latest_addr_code(base_url):
-        content = AddressCode.read_addr_code_from_local()
-        if content is None:
-            AddressCode.save_add_code_html_text(base_url)
-            content = AddressCode.read_addr_code_from_local()
+        content = AddressCode.get_latest_addr_code_html(base_url)
 
         soup = BeautifulSoup(content, 'html.parser')
         tds = soup.find_all('td')
@@ -74,11 +53,31 @@ class AddressCode:
         for td in iter_tds:
             if Utils.represents_int(td.string):
                 dic[td.string] = next(iter_tds).string
+
         return dic
+
+    @staticmethod
+    def save_addr_code_to_json(base_url):
+        with open('../data/addr_code.json', 'w') as file:
+            addr_code_dict = AddressCode.get_latest_addr_code(base_url)
+            file.write(json.dumps(addr_code_dict, ensure_ascii=False))
+
+
+    @staticmethod
+    def read_addr_code_from_local():
+        try:
+            file = open('../data/addr_code.json', 'r')
+        except FileNotFoundError as err:
+            print(err)
+        except OSError as err:
+            print(err)
+        else:
+            content = json.load(file)
+            file.close()
+            return content
 
 
 if __name__ == '__main__':
     url = 'http://www.mca.gov.cn/article/sj/xzqh//1980/'
-    print(AddressCode.get_latest_addr_code_url(url))
-    dic = AddressCode.get_latest_addr_code(url)
-    print(dic)
+    # AddressCode.save_addr_code_to_json(url)
+    pprint(AddressCode.read_addr_code_from_local())
